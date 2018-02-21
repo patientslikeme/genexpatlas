@@ -3,7 +3,7 @@ A package to programmatically access the [EMBL-EBI's Gene Expression Atlas](http
 
 ## Overview
 This project began as a translation of the [ExpressionAtlas](http://www.bioconductor.org/packages/release/bioc/html/ExpressionAtlas.html)
-R package into Python 2.x at [PatientsLikeMe](https://patientslikeme.com). We are open-sourcing this tool to make it 
+R package into Python 2.x at [PatientsLikeMe](https://blog.patientslikeme.com). We are open-sourcing this tool to make it 
 available to researchers, engineers, and individuals who wish to use Python to programmatically access the Gene 
 Expression Atlas. 
 

@@ -12,7 +12,7 @@ setup(name='genexpatlas',
           'xmltodict',
       ],
       project_urls={
-          'PatientsLikeMe': 'https://patientslikeme.com',
+          'PatientsLikeMe': 'https://blog.patientslikeme.com',
           'Bug reports': 'https://github.com/patientslikeme/genexpatlas/issues',
           'Source': 'https://github.com/patientslikeme/genexpatlas',
       },
