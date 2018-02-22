@@ -13,7 +13,7 @@ import urllib2
 import xmltodict
 
 
-def search_atlas_experiments(search=[], species='', summary=False):
+def search_atlas_experiments(search=None, species='', summary=False):
     """
     Search against ArrayExpress API for Atlas datasets matching given terms
     :param search: Keywords describing search to be done. Defaults to None
@@ -25,11 +25,14 @@ def search_atlas_experiments(search=[], species='', summary=False):
     :return: list dicts of results. If summary, sorted by species, experiment type, and accession
     """
 
+    if search is None:
+        search = []
+
     query = {'gxa': True}
     base_url = "https://www.ebi.ac.uk/arrayexpress/json/v3/experiments"
 
     if search:
-        if search.__len__() > 1:
+        if len(search) > 1:
             search = " OR ".join(search)
         query['keywords'] = search
     if species:
@@ -46,8 +49,8 @@ def search_atlas_experiments(search=[], species='', summary=False):
     experiments_found = int(parsed['experiments']['total'])
 
     if experiments_found == 0:
-        raise ValueError("No experiments found for search criteria {} and species {}".format(query['keywords'],
-                                                                                             query['species']))
+        raise ValueError("No experiments found for search criteria {keywords} and species {species}".format(
+            keywords=query['keywords'], species=query['species']))
 
     if summary is True:
         # Build list of dicts of the following for each experiment: accession, study name, organism, experimenttype
@@ -135,13 +138,11 @@ def get_atlas_experiment_summaries(accessions):
     result = []
     valid_accessions = [x for x in accessions if __is_valid_experiment_accession(x)]
 
-    if valid_accessions.__len__() == 0:
+    if len(valid_accessions) == 0:
         raise ValueError("No valid accessions found")
-        pass
 
-    if valid_accessions.__len__() != accessions.__len__():
+    if len(valid_accessions) != len(accessions):
         raise ValueError("No valid accessions found")
-        pass
 
     for accession in valid_accessions:
         try:
