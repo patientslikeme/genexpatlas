@@ -84,8 +84,8 @@ def get_atlas_experiments(experiments):
     for experiment in valid_experiments:
         try:
             experiment['data'] = get_atlas_experiment(experiment)
-        except ValueError as e:
-            warnings.warn(e)
+        except Exception:
+            warnings.warn("Experiment not in correct format, skipping")
 
     return valid_experiments
 
@@ -104,12 +104,17 @@ def get_atlas_experiment(experiment):
     base_url = "ftp://ftp.ebi.ac.uk/pub/databases/microarray/data/atlas/experiments/"
     file_name = experiment['accession']
 
-    file_name = file_name + '/' + file_name + '_' + experiment['arraydesign'][0]['accession'] + '-analytics' + '.tsv'
-    url = base_url + file_name
     try:
+        file_name = file_name + '/' + file_name + '_' + experiment['arraydesign'][0]['accession'] + '-analytics' + '.tsv'
+        url = base_url + file_name
         loaded_data = pd.read_csv(url, sep='\t')
     except:
-        raise
+        try:
+            file_name = file_name + '/' + file_name + '-analytics' + '.tsv'
+            url = base_url + file_name
+            loaded_data = pd.read_csv(url, sep='\t')
+        except Exception as e:
+            raise e
 
     # Get translations of contrast ids to comparison names
     configuration_url = base_url + experiment['accession'] + '/' + experiment['accession'] + '-configuration.xml'
@@ -119,8 +124,12 @@ def get_atlas_experiment(experiment):
     config_file.close()
     parsed_config = xmltodict.parse(loaded_config)
     compare_dict = {}
-    for contrast in parsed_config['configuration']['analytics']['contrasts']['contrast']:
-        compare_dict[contrast['@id']] = contrast['name']
+    for name, contrast in parsed_config['configuration']['analytics']['contrasts'].items():
+        if type(contrast) is list:
+            for ind_contrast in contrast:
+                compare_dict[ind_contrast['@id']] = ind_contrast['name']
+        else:
+            compare_dict[contrast['@id']] = contrast['name']
 
     readable_data = __translate_data_headers(loaded_data, compare_dict)
 
