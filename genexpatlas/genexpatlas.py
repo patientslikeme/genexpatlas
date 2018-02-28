@@ -105,12 +105,12 @@ def get_atlas_experiment(experiment):
     file_name = experiment['accession']
 
     try:
-        file_name = file_name + '/' + file_name + '_' + experiment['arraydesign'][0]['accession'] + '-analytics' + '.tsv'
+        file_name = file_name + '/' + file_name + '_' + experiment['arraydesign'][0]['accession'] + '-analytics.tsv'
         url = base_url + file_name
         loaded_data = pd.read_csv(url, sep='\t')
     except:
         try:
-            file_name = file_name + '/' + file_name + '-analytics' + '.tsv'
+            file_name = file_name + '/' + file_name + '-analytics.tsv'
             url = base_url + file_name
             loaded_data = pd.read_csv(url, sep='\t')
         except Exception as e:
