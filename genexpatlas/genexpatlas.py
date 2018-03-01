@@ -122,15 +122,7 @@ def get_atlas_experiment(experiment):
     config_file = urllib2.urlopen(configuration_url)
     loaded_config = config_file.read()
     config_file.close()
-    parsed_config = xmltodict.parse(loaded_config)
-    compare_dict = {}
-    for name, contrast in parsed_config['configuration']['analytics']['contrasts'].items():
-        if type(contrast) is list:
-            for ind_contrast in contrast:
-                compare_dict[ind_contrast['@id']] = ind_contrast['name']
-        else:
-            compare_dict[contrast['@id']] = contrast['name']
-
+    compare_dict = __get_comparison_translations(xmltodict.parse(loaded_config))
     readable_data = __translate_data_headers(loaded_data, compare_dict)
 
     return readable_data
@@ -169,6 +161,33 @@ def get_atlas_experiment_summary(accession):
     :return:
     """
     pass
+
+
+def __get_comparison_translations(parsed_config):
+    """
+    Builds a translation dictionary of g1, etc. abbreviations to human-readable comparison names
+    :param parsed_config: a parsed XML configuration file
+    :return: translation dictionary
+    """
+    compare_dict = {}
+
+    if type(parsed_config['configuration']['analytics']) is list:
+        for item in parsed_config['configuration']['analytics']:
+            for name, contrast in item['contrasts'].items():
+                if type(contrast) is list:
+                    for ind_contrast in contrast:
+                        compare_dict[ind_contrast['@id']] = ind_contrast['name']
+                else:
+                    compare_dict[contrast['@id']] = contrast['name']
+    else:
+        for name, contrast in parsed_config['configuration']['analytics']['contrasts'].items():
+            if type(contrast) is list:
+                for ind_contrast in contrast:
+                    compare_dict[ind_contrast['@id']] = ind_contrast['name']
+            else:
+                compare_dict[ind_contrast['@id']] = ind_contrast['name']
+
+    return compare_dict
 
 
 def __is_valid_experiment_accession(accession):
