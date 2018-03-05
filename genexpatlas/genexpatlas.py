@@ -75,10 +75,10 @@ def get_atlas_experiments(experiments):
 
     valid_experiments = [x for x in experiments if __is_valid_experiment_accession(x['accession'])]
 
-    if valid_experiments.__len__() == 0:
+    if len(valid_experiments) == 0:
         raise ValueError("No valid accessions found")
 
-    if valid_experiments.__len__() != experiments.__len__():
+    if len(valid_experiments) != len(experiments):
         warnings.warn("Invalid accessions found, will be removed", UserWarning)
 
     for experiment in valid_experiments:
@@ -87,7 +87,12 @@ def get_atlas_experiments(experiments):
             experiment['data'] = exp_data[0]
             experiment['contrasts'] = exp_data[1]
         except Exception:
-            warnings.warn("Experiment not in correct format, skipping")
+            warnings.warn("Experiment not in correct format, removing")
+
+    valid_experiments[:] = [exp for exp in valid_experiments if 'data' in exp]
+
+    if len(valid_experiments) == 0:
+        raise ValueError("No valid accessions found")
 
     return valid_experiments
 
@@ -225,3 +230,8 @@ def __translate_data_headers(experiment_data, translation_table):
 
     experiment_data = experiment_data.rename(columns=trans_dict)
     return experiment_data
+
+
+result = search_atlas_experiments(search=['E-MTAB-3983'], species='Homo sapiens')
+exp = get_atlas_experiments(result)
+print exp

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='genexpatlas',
-      version='0.4.1-alpha',
+      version='0.5.0-alpha',
       description='Python interface to the Genetic Expression Atlas',
       author='Kyle Stratis',
       author_email='kstratis@patientslikeme.com',
