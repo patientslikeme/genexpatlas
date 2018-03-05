@@ -70,7 +70,7 @@ def get_atlas_experiments(experiments):
     Download multiple experiments in one call and add to metadata
     :param experiments: a list of full experiments to pull full data from
     :type experiments: list
-    :return: list of all successful results
+    :return: tuple: list of all successful results and list of contrasts
     """
 
     valid_experiments = [x for x in experiments if __is_valid_experiment_accession(x['accession'])]
@@ -83,7 +83,9 @@ def get_atlas_experiments(experiments):
 
     for experiment in valid_experiments:
         try:
-            experiment['data'] = get_atlas_experiment(experiment)
+            exp_data = get_atlas_experiment(experiment)
+            experiment['data'] = exp_data[0]
+            experiment['contrasts'] = exp_data[1]
         except Exception:
             warnings.warn("Experiment not in correct format, skipping")
 
@@ -125,7 +127,7 @@ def get_atlas_experiment(experiment):
     compare_dict = __get_comparison_translations(xmltodict.parse(loaded_config))
     readable_data = __translate_data_headers(loaded_data, compare_dict)
 
-    return readable_data
+    return readable_data, compare_dict.values()
 
 
 def get_atlas_experiment_summaries(accessions):
