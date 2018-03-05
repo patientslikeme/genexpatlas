@@ -230,8 +230,3 @@ def __translate_data_headers(experiment_data, translation_table):
 
     experiment_data = experiment_data.rename(columns=trans_dict)
     return experiment_data
-
-
-result = search_atlas_experiments(search=['E-MTAB-3983'], species='Homo sapiens')
-exp = get_atlas_experiments(result)
-print exp
