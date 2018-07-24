@@ -73,28 +73,15 @@ def get_atlas_experiments(experiments):
     :return: list: list of all successful results
     """
 
-    valid_experiments = [x for x in experiments if __is_valid_experiment_accession(x['accession'])]
-
-    if len(valid_experiments) == 0:
-        raise ValueError("No valid accessions found")
-
-    if len(valid_experiments) != len(experiments):
-        warnings.warn("Invalid accessions found, will be removed", UserWarning)
-
+    valid_experiments = (x for x in experiments if __is_valid_experiment_accession(x['accession']))
     for experiment in valid_experiments:
         try:
             exp_data = get_atlas_experiment(experiment)
             experiment['data'] = exp_data[0]
             experiment['contrasts'] = exp_data[1]
+            yield experiment
         except Exception:
             warnings.warn("Experiment not in correct format, removing")
-
-    valid_experiments[:] = [exp for exp in valid_experiments if 'data' in exp]
-
-    if len(valid_experiments) == 0:
-        raise ValueError("No valid accessions found")
-
-    return valid_experiments
 
 
 def get_atlas_experiment(experiment):
