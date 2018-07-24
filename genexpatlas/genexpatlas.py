@@ -70,7 +70,7 @@ def get_atlas_experiments(experiments):
     Download multiple experiments in one call and add to metadata
     :param experiments: a list of full experiments to pull full data from
     :type experiments: list
-    :return: list: list of all successful results
+    :return: generator
     """
 
     valid_experiments = (x for x in experiments if __is_valid_experiment_accession(x['accession']))
