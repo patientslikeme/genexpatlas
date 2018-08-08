@@ -7,7 +7,6 @@ import re
 import requests
 import json
 import pandas as pd
-import warnings
 from operator import itemgetter
 import urllib2
 import xmltodict
@@ -80,8 +79,9 @@ def get_atlas_experiments(experiments):
             experiment['data'] = exp_data[0]
             experiment['contrasts'] = exp_data[1]
             yield experiment
-        except Exception:
-            warnings.warn("Experiment not in correct format, removing")
+        except Exception as e:
+            e.msg += "Experiment not in expected format, skipping"
+            raise e
 
 
 def get_atlas_experiment(experiment):
@@ -143,7 +143,7 @@ def get_atlas_experiment_summaries(accessions):
         try:
             result.append(get_atlas_experiment_summary(accession))
         except ValueError as e:
-            warnings.warn(e)
+            raise e
 
     return result
 
