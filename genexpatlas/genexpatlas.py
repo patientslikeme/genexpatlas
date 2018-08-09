@@ -80,7 +80,7 @@ def get_atlas_experiments(experiments):
             experiment['contrasts'] = exp_data[1]
             yield experiment
         except Exception as e:
-            e.msg += "Experiment not in expected format, skipping"
+            e.message += "Experiment not in expected format, skipping"
             raise e
 
 
