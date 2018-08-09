@@ -181,7 +181,7 @@ def __get_comparison_translations(parsed_config):
                 for ind_contrast in contrast:
                     compare_dict[ind_contrast['@id']] = ind_contrast['name']
             else:
-                compare_dict[ind_contrast['@id']] = ind_contrast['name']
+                compare_dict[contrast['@id']] = contrast['name']
 
     return compare_dict
 
