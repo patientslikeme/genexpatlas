@@ -79,9 +79,11 @@ def get_atlas_experiments(experiments):
             experiment['data'] = exp_data[0]
             experiment['contrasts'] = exp_data[1]
             yield experiment
-        except Exception as e:
-            e.message += "Experiment not in expected format, skipping"
-            raise e
+        # We want to ignore some expected errors, otherwise iteration would stop
+        except ValueError:
+            pass
+        except IOError:
+            pass
 
 
 def get_atlas_experiment(experiment):
@@ -107,7 +109,7 @@ def get_atlas_experiment(experiment):
             file_name = file_name + '/' + file_name + '-analytics.tsv'
             url = base_url + file_name
             loaded_data = pd.read_csv(url, sep='\t')
-        except Exception as e:
+        except IOError as e:
             raise e
 
     # Get translations of contrast ids to comparison names
