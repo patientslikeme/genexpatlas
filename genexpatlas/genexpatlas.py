@@ -8,7 +8,7 @@ import requests
 import json
 import pandas as pd
 from operator import itemgetter
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import xmltodict
 
 
@@ -115,13 +115,13 @@ def get_atlas_experiment(experiment):
     # Get translations of contrast ids to comparison names
     configuration_url = base_url + experiment['accession'] + '/' + experiment['accession'] + '-configuration.xml'
 
-    config_file = urllib2.urlopen(configuration_url)
+    config_file = urllib.request.urlopen(configuration_url)
     loaded_config = config_file.read()
     config_file.close()
     compare_dict = __get_comparison_translations(xmltodict.parse(loaded_config))
     readable_data = __translate_data_headers(loaded_data, compare_dict)
 
-    return readable_data, compare_dict.values()
+    return readable_data, list(compare_dict.values())
 
 
 def get_atlas_experiment_summaries(accessions):
