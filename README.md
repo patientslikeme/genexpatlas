@@ -17,6 +17,10 @@ a Pandas dataframe.
 support for baseline studies is, as of the current release, untested and the lack of an `*analytics.tsv` file will 
 cause an error.
 
+## Branch Management
+All code for Python3 should reside on the `py3` branch, while Python2 code can be found on `master`. This will shift as     
+dependent code bases move to Python 3.
+
 ## Installation
 Install with `pip` via Github:  
 `pip install git+git://github.com/patientslikeme/genexpatlas.git`
