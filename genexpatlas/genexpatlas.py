@@ -219,3 +219,28 @@ def __translate_data_headers(experiment_data, translation_table):
 
     experiment_data = experiment_data.rename(columns=trans_dict)
     return experiment_data
+
+
+def run_execution_tests():
+    print("Running simple execution test that determines that code paths run without error")
+
+    print("search_atlas_experiments with summary data")
+    exp = search_atlas_experiments(species='homo sapiens', summary=True)
+
+    print("get_atlas_experiment with first experiment from search results")
+    data = get_atlas_experiment(exp[0])
+
+    print("get_atlas_experiment_summaries with first experiment from search results")
+    summary = get_atlas_experiment_summaries(exp[0]['accession'])
+
+    print("search_atlas_experiments without summary data")
+    exp = search_atlas_experiments(species='homo sapiens', summary=False)
+
+    print("get_atlas_experiments with all results (produces generator)")
+    data = get_atlas_experiments(exp)
+
+    print("Methods executed successfully")
+
+
+if __name__ == '__main__':
+    run_execution_tests()
