@@ -11,6 +11,8 @@ from operator import itemgetter
 import urllib2
 import xmltodict
 
+base_url = "ftp://ftp.ebi.ac.uk/pub/databases/microarray/data/atlas/experiments/"
+
 
 def search_atlas_experiments(search=None, species='', summary=False):
     """
@@ -97,7 +99,6 @@ def get_atlas_experiment(experiment):
     if not __is_valid_experiment_accession(experiment['accession']):
         raise ValueError("Invalid accession: {}".format(experiment['acession']))
 
-    base_url = "ftp://ftp.ebi.ac.uk/pub/databases/microarray/data/atlas/experiments/"
     file_name = experiment['accession']
 
     try:
@@ -152,11 +153,21 @@ def get_atlas_experiment_summaries(accessions):
 
 def get_atlas_experiment_summary(accession):
     """
-    TODO: Download R data summary and load into Python-supported structure
-    :param accession:
-    :return:
+    Currently, downloads RData summary to userspace.
+    TODO: load into Python-supported structure, likely with rpy2
+    :param accession: a string of an experiment's accession
     """
-    pass
+
+    filename = accession + "-atlasExperimentSummary.Rdata"
+    full_url = base_url + filename
+
+    try:
+        file = urllib2.urlopen(full_url)
+    except urllib2.URLError as e:
+        raise e
+
+    with open("~/" + filename, "wb") as d:
+        d.write(file.read())
 
 
 def __get_comparison_translations(parsed_config):
