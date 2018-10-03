@@ -10,6 +10,8 @@ import pandas as pd
 from operator import itemgetter
 import urllib2
 import xmltodict
+import os
+import errno
 
 base_url = "ftp://ftp.ebi.ac.uk/pub/databases/microarray/data/atlas/experiments/"
 
@@ -125,11 +127,13 @@ def get_atlas_experiment(experiment):
     return readable_data, compare_dict.values()
 
 
-def get_atlas_experiment_summaries(accessions):
+def get_atlas_experiment_summaries(accessions, directory):
     """
     Download multiple R data summaries in one call, translated from R package
     :param accessions: a list of accessions to pull
     :type accessions: list
+    :param directory: directory to download files to
+    :type directory: str
     :return: list of all successful results
     """
 
@@ -142,32 +146,44 @@ def get_atlas_experiment_summaries(accessions):
     if len(valid_accessions) != len(accessions):
         raise ValueError("No valid accessions found")
 
+    # Set up download directory
+    directory = __dir_setup(directory)
+
     for accession in valid_accessions:
         try:
-            result.append(get_atlas_experiment_summary(accession))
-        except ValueError as e:
+            result.append(get_atlas_experiment_summary(accession, directory))
+        except (ValueError, IOError, urllib2.URLError) as e:
             raise e
 
     return result
 
 
-def get_atlas_experiment_summary(accession):
+def get_atlas_experiment_summary(accession, directory):
     """
-    Currently, downloads RData summary to userspace.
+    Currently, downloads RData summary to supplied directory.
     TODO: load into Python-supported structure, likely with rpy2
     :param accession: a string of an experiment's accession
+    :type accessions: list
+    :param directory: directory to download files to
+    :type directory: str
+    :return: successful accession
     """
 
     filename = accession + "-atlasExperimentSummary.Rdata"
-    full_url = base_url + filename
+    full_url = base_url + "/" + accession + "/" + filename
 
     try:
-        file = urllib2.urlopen(full_url)
+        f = urllib2.urlopen(full_url)
     except urllib2.URLError as e:
         raise e
 
-    with open("~/" + filename, "wb") as d:
-        d.write(file.read())
+    try:
+        with open(directory + filename, "wb") as d:
+            d.write(f.read())
+    except IOError as e:
+        raise e
+
+    return accession
 
 
 def __get_comparison_translations(parsed_config):
@@ -232,6 +248,21 @@ def __translate_data_headers(experiment_data, translation_table):
     return experiment_data
 
 
+def __dir_setup(directory):
+    """
+    Sets up data directory
+    :return: directory name
+    """
+
+    try:
+        os.makedirs(directory)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+    return directory
+
+
 def run_execution_tests():
     print("Running simple execution test that determines that code paths run without error")
 
@@ -241,8 +272,11 @@ def run_execution_tests():
     print("get_atlas_experiment with first experiment from search results")
     data = get_atlas_experiment(exp[0])
 
-    print("get_atlas_experiment_summaries with first experiment from search results")
-    summary = get_atlas_experiment_summaries(exp[0]['accession'])
+    print("get_atlas_experiment_summaries with first 3 experiments from search results")
+    try:
+        summary = get_atlas_experiment_summaries([x['accession'] for x in exp[0:2]], directory=os.getcwd())
+    except Exception as e:
+        print(e.msg)
 
     print("search_atlas_experiments without summary data")
     exp = search_atlas_experiments(species='homo sapiens', summary=False)
